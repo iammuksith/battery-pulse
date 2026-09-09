@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Battery Pulse</string>
+    <string name="tab_overview">Overview</string>
+    <string name="tab_history">History</string>
+    <string name="tab_sessions">Sessions</string>
+    <string name="tab_optimizer">Optimizer</string>
+
+    <string name="status_charging">Charging</string>
+    <string name="status_discharging">Discharging</string>
+    <string name="status_not_charging">Not Charging</string>
+    <string name="status_full">Full</string>
+    <string name="status_unknown">Unknown</string>
+
+    <string name="health_good">Good</string>
+    <string name="health_overheat">Overheat</string>
+    <string name="health_dead">Dead</string>
+    <string name="health_over_voltage">Over Voltage</string>
+    <string name="health_unspecified_failure">Failure</string>
+    <string name="health_cold">Cold</string>
+
+    <string name="plug_ac">AC Charger</string>
+    <string name="plug_usb">USB Port</string>
+    <string name="plug_wireless">Wireless Dock</string>
+    <string name="plug_dock">Docking Station</string>
+    <string name="plug_unplugged">On Battery</string>
+
+    <string name="card_metrics_title">Technical Metrics</string>
+    <string name="metric_voltage">Voltage</string>
+    <string name="metric_temperature">Temperature</string>
+    <string name="metric_health">Health Condition</string>
+    <string name="metric_technology">Technology</string>
+    <string name="metric_power_source">Power Source</string>
+    <string name="metric_capacity">Reported Capacity</string>
+    <string name="metric_current">Instantaneous Current</string>
+
+    <string name="card_drain_title">Discharge &amp; Charge Analysis</string>
+    <string name="metric_drain_rate">Estimated Drain Rate</string>
+    <string name="metric_time_remaining">Estimated Remaining</string>
+    <string name="time_until_full">Time Until Full</string>
+    <string name="time_until_empty">Time Until Empty</string>
+
+    <string name="card_privacy_title">100% Privacy by Design</string>
+    <string name="card_privacy_subtitle">Zero telemetry. Works completely offline. No user accounts or background tracking.</string>
+
+    <string name="history_title">Battery Level Timeline</string>
+    <string name="history_empty">No battery records logged yet. Records update automatically when power states change.</string>
+    <string name="history_clear_btn">Clear History</string>
+
+    <string name="sessions_title">Charging Sessions</string>
+    <string name="sessions_empty">No recorded charging cycles yet. Plug in your device to log your first session.</string>
+    <string name="session_active">Active Charging Session</string>
+    <string name="session_duration">Duration</string>
+    <string name="session_gain">Charge Gain</string>
+    <string name="session_speed">Avg Speed</string>
+
+    <string name="optimizer_title">Battery Saver &amp; Process Control</string>
+    <string name="optimizer_desc">Optimize device runtime and manage background apps consuming energy.</string>
+    <string name="saver_mode_title">In-App Low Power Mode</string>
+    <string name="saver_mode_desc">Reduces UI animations and minimizes resource footprint.</string>
+    <string name="action_system_saver">Open System Battery Saver</string>
+    <string name="action_battery_usage">View App Battery Usage</string>
+    <string name="action_manage_apps">Manage Background Drain Apps</string>
+
+    <string name="alerts_title">Smart Battery Pulse Alerts</string>
+    <string name="alert_80_title">80% Charge Limit Reminder</string>
+    <string name="alert_80_desc">Notify when battery reaches 80% to protect long-term cell health.</string>
+    <string name="alert_temp_title">High Temperature Warning</string>
+    <string name="alert_temp_desc">Notify if battery temperature rises above safe threshold.</string>
+    <string name="alert_low_title">Low Battery Warning</string>
+    <string name="alert_low_desc">Notify when battery drops below safe threshold (20%).</string>
+    <string name="alert_threshold_temp">Safe Temperature Limit</string>
+    <string name="alert_threshold_low">Low Battery Trigger</string>
+    <string name="alert_test_low_btn">Test Low Battery Alert</string>
+    <string name="alert_test_temp_btn">Test Overheat Alert</string>
+    <string name="banner_low_battery_title">Low Battery Alert</string>
+    <string name="banner_low_battery_desc">Battery dropped below 20%. Connect charger or enable Battery Saver to extend runtime.</string>
+    <string name="banner_high_temp_title">Safe Temperature Exceeded</string>
+    <string name="banner_high_temp_desc">Battery temperature exceeds safe limits. Cool down the device to prevent lithium-ion degradation.</string>
+    <string name="permission_rationale">Battery Pulse only asks for notification permission so it can send your chosen battery protection alerts.</string>
+    <string name="permission_grant">Enable Notifications</string>
+</resources>
