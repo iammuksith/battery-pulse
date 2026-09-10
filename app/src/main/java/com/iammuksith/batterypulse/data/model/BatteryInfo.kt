@@ -36,6 +36,7 @@ data class BatteryInfo(
     val technology: String = "Li-ion",
     val isPresent: Boolean = true,
     val currentNowMa: Int? = null,
+    val chargeCounterMah: Int? = null,
     val chargeTimeRemainingMs: Long? = null,
     val timestamp: Long = System.currentTimeMillis(),
     val isValid: Boolean = false
