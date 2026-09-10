@@ -123,71 +123,120 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun calculateDischargeAnalysis(
-        currentInfo: BatteryInfo,
-        logs: List<BatteryLogEntity>
-    ): DischargeAnalysis {
-        if (logs.isEmpty()) {
-            return DischargeAnalysis(
-                isCharging = currentInfo.isCharging,
-                estimatedMinutesRemaining = if (currentInfo.isCharging) {
-                    currentInfo.chargeTimeRemainingMs?.let { it / (1000 * 60) }
-                } else {
-                    // Nominal estimate (approx 6 hours on 100%)
-                    (currentInfo.level * 4.5f).toLong()
-                }
-            )
-        }
+fun calculateDischargeAnalysis(
+    currentInfo: BatteryInfo,
+    logs: List<BatteryLogEntity>
+): DischargeAnalysis {
+    val minTemp = logs.minOfOrNull { it.temperature }
+    val maxTemp = logs.maxOfOrNull { it.temperature }
+    val avgVolt = logs
+        .map { it.voltage }
+        .filter { it > 0 }
+        .average()
+        .takeIf { !it.isNaN() }
+        ?.toInt()
 
-        val minTemp = logs.minOfOrNull { it.temperature }
-        val maxTemp = logs.maxOfOrNull { it.temperature }
-        val avgVolt = logs.map { it.voltage }.average().toInt()
+    // Charging: use Android's own charge-time estimate.
+    if (currentInfo.isCharging) {
+        val remainingMins = currentInfo.chargeTimeRemainingMs
+            ?.takeIf { it > 0 }
+            ?.div(1000 * 60)
 
-        if (currentInfo.isCharging) {
-            val remainingMins = currentInfo.chargeTimeRemainingMs?.let { it / (1000 * 60) }
-                ?: run {
-                    val neededPct = (100 - currentInfo.level).coerceAtLeast(0)
-                    (neededPct * 1.5f).toLong() // Nominal ~1.5 min per 1%
-                }
+        return DischargeAnalysis(
+            isCharging = true,
+            drainRatePerHour = null,
+            estimatedMinutesRemaining = remainingMins,
+            minRecordedTemp = minTemp,
+            maxRecordedTemp = maxTemp,
+            avgRecordedVoltage = avgVolt
+        )
+    }
 
-            return DischargeAnalysis(
-                isCharging = true,
-                drainRatePerHour = null,
-                estimatedMinutesRemaining = remainingMins,
-                minRecordedTemp = minTemp,
-                maxRecordedTemp = maxTemp,
-                avgRecordedVoltage = avgVolt
-            )
-        } else {
-            // Calculate drain rate from recent discharging entries
-            val dischargingLogs = logs.filter { !it.isCharging }.take(30)
-            var calculatedRate: Float? = null
-            var estimatedMins: Long? = null
+    // Discharging: use direct battery telemetry first.
+    var drainRatePerHour: Float? = null
+    var estimatedMinutesRemaining: Long? = null
 
-            if (dischargingLogs.size >= 2) {
-                val oldest = dischargingLogs.last()
-                val newest = dischargingLogs.first()
-                val timeDiffHours = (newest.timestamp - oldest.timestamp).toFloat() / (1000f * 60f * 60f)
-                val levelDiff = (oldest.level - newest.level).toFloat()
+    val remainingMah = currentInfo.chargeCounterMah?.toFloat()
+    val currentMa = currentInfo.currentNowMa?.toFloat()
 
-                if (timeDiffHours > 0.05f && levelDiff >= 1) {
-                    calculatedRate = (levelDiff / timeDiffHours).coerceIn(1f, 50f)
+    if (
+        currentInfo.status == BatteryStatus.DISCHARGING &&
+        remainingMah != null &&
+        remainingMah > 0f &&
+        currentMa != null &&
+        currentMa < 0f
+    ) {
+        val dischargeCurrentMa = -currentMa
+        val hoursRemaining = remainingMah / dischargeCurrentMa
+
+        if (hoursRemaining.isFinite() && hoursRemaining > 0f) {
+            estimatedMinutesRemaining = (hoursRemaining * 60f).toLong()
+
+            if (currentInfo.level > 0) {
+                val estimatedFullCapacityMah =
+                    remainingMah / (currentInfo.level / 100f)
+
+                if (
+                    estimatedFullCapacityMah.isFinite() &&
+                    estimatedFullCapacityMah > 0f
+                ) {
+                    drainRatePerHour =
+                        (dischargeCurrentMa / estimatedFullCapacityMah) * 100f
                 }
             }
-
-            val effectiveRate = calculatedRate ?: 12.0f // Nominal standard ~12% per hour
-            estimatedMins = ((currentInfo.level / effectiveRate) * 60f).toLong().coerceAtLeast(5)
-
-            return DischargeAnalysis(
-                drainRatePerHour = calculatedRate,
-                estimatedMinutesRemaining = estimatedMins,
-                isCharging = false,
-                minRecordedTemp = minTemp,
-                maxRecordedTemp = maxTemp,
-                avgRecordedVoltage = avgVolt
-            )
         }
     }
+
+    // Historical fallback when direct telemetry is unavailable.
+    if (estimatedMinutesRemaining == null) {
+        val now = currentInfo.timestamp
+        val recentWindowMs = 6L * 60L * 60L * 1000L
+
+        val dischargingLogs = logs
+            .filter { !it.isCharging }
+            .filter { it.timestamp <= now }
+            .filter { now - it.timestamp <= recentWindowMs }
+            .sortedByDescending { it.timestamp }
+
+        if (dischargingLogs.size >= 2) {
+            val newest = dischargingLogs.first()
+            val oldest = dischargingLogs.last()
+
+            val elapsedHours =
+                (newest.timestamp - oldest.timestamp).toFloat() /
+                    (1000f * 60f * 60f)
+
+            val levelDrop =
+                (oldest.level - newest.level).toFloat()
+
+            if (
+                elapsedHours >= 0.10f &&
+                levelDrop >= 2f
+            ) {
+                val historicalRate = levelDrop / elapsedHours
+
+                if (
+                    historicalRate.isFinite() &&
+                    historicalRate > 0f
+                ) {
+                    drainRatePerHour = historicalRate
+                    estimatedMinutesRemaining =
+                        ((currentInfo.level / historicalRate) * 60f)
+                            .toLong()
+                }
+            }
+        }
+    }
+
+    return DischargeAnalysis(
+        drainRatePerHour = drainRatePerHour,
+        estimatedMinutesRemaining = estimatedMinutesRemaining,
+        isCharging = false,
+        minRecordedTemp = minTemp,
+        maxRecordedTemp = maxTemp,
+        avgRecordedVoltage = avgVolt
+    )
+}
 
     fun toggleLowPowerMode(enabled: Boolean) {
         _isLowPowerModeEnabled.value = enabled
