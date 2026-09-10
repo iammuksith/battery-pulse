@@ -19,7 +19,6 @@ class NotificationHelper(private val context: Context) {
     companion object {
         const val CHANNEL_CRITICAL = "battery_critical_alerts"
         const val CHANNEL_GENERAL = "battery_general_alerts"
-        const val NOTIF_ID_LOW_BATTERY = 2001
         const val NOTIF_ID_TEMP_ALERT = 2002
         const val NOTIF_ID_CHARGE_LIMIT = 2003
         const val NOTIF_ID_TEST = 2004
@@ -33,13 +32,13 @@ class NotificationHelper(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Critical alerts channel (Low battery and Overheating)
+            // Critical alerts channel (Overheating)
             val criticalChannel = NotificationChannel(
                 CHANNEL_CRITICAL,
                 "Battery Safety & Warning Alerts",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Urgent notifications when battery level drops below 20% or temperature exceeds safe limits."
+                description = "Urgent notifications when battery temperature exceeds safe limits."
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 300, 150, 300)
                 setShowBadge(true)
@@ -68,56 +67,6 @@ class NotificationHelper(private val context: Context) {
             ) == PackageManager.PERMISSION_GRANTED
         } else {
             true
-        }
-    }
-
-    fun showLowBatteryAlert(level: Int, threshold: Int = 20) {
-        if (!hasNotificationPermission()) return
-
-        // Tap action: open app
-        val contentIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val contentPendingIntent = PendingIntent.getActivity(
-            context,
-            101,
-            contentIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        // Action button: Open Android Battery Saver Settings
-        val saverIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        val saverPendingIntent = PendingIntent.getActivity(
-            context,
-            102,
-            saverIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_CRITICAL)
-            .setSmallIcon(android.R.drawable.stat_sys_warning)
-            .setContentTitle("⚠️ Low Battery Alert ($level%)")
-            .setContentText("Battery dropped below $threshold%. Plug in your device or enable Battery Saver now.")
-            .setStyle(NotificationCompat.BigTextStyle().bigText(
-                "Battery level is now at $level% (below the $threshold% safety threshold). Connect your charger or activate Battery Saver to prevent shutdown."
-            ))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setSound(soundUri)
-            .setVibrate(longArrayOf(0, 300, 150, 300))
-            .setAutoCancel(true)
-            .setContentIntent(contentPendingIntent)
-            .addAction(android.R.drawable.ic_menu_preferences, "Turn On Saver", saverPendingIntent)
-            .build()
-
-        try {
-            NotificationManagerCompat.from(context).notify(NOTIF_ID_LOW_BATTERY, notification)
-        } catch (_: SecurityException) {
-            // Handled safely
         }
     }
 
