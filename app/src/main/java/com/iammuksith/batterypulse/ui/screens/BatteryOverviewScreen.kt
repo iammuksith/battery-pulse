@@ -254,14 +254,22 @@ fun BatteryOverviewScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Medium
                             )
+    val formattedTime = dischargeAnalysis.estimatedMinutesRemaining?.let { estimatedMins ->
+    val hours = estimatedMins / 60
+    val mins = estimatedMins % 60
 
-                            val estimatedMins = dischargeAnalysis.estimatedMinutesRemaining ?: 0
-                            val hours = estimatedMins / 60
-                            val mins = estimatedMins % 60
-                            val formattedTime = if (hours > 0) "${hours}h ${mins}m" else "${mins}m"
+    if (hours > 0) {
+        "${hours}h ${mins}m"
+     } else {
+        "${mins}m"
+       }
+   } ?: "Calculating"
 
                             Text(
-                                text = if (batteryInfo.status == BatteryStatus.FULL) "Fully Charged" else formattedTime,
+                                text = when {
+                                       batteryInfo.status == BatteryStatus.FULL -> "Fully Charged"
+                                  else -> formattedTime
+                             },
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
