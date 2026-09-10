@@ -66,11 +66,7 @@
     <string name="alert_80_desc">Notify when battery reaches 80% to protect long-term cell health.</string>
     <string name="alert_temp_title">High Temperature Warning</string>
     <string name="alert_temp_desc">Notify if battery temperature rises above safe threshold.</string>
-    <string name="alert_low_title">Low Battery Warning</string>
-    <string name="alert_low_desc">Notify when battery drops below safe threshold (20%).</string>
     <string name="alert_threshold_temp">Safe Temperature Limit</string>
-    <string name="alert_threshold_low">Low Battery Trigger</string>
-    <string name="alert_test_low_btn">Test Low Battery Alert</string>
     <string name="alert_test_temp_btn">Test Overheat Alert</string>
     <string name="banner_low_battery_title">Low Battery Alert</string>
     <string name="banner_low_battery_desc">Battery dropped below 20%. Connect charger or enable Battery Saver to extend runtime.</string>
