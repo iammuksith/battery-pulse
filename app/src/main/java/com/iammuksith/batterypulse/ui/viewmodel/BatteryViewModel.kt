@@ -85,6 +85,7 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun checkSmartAlerts(info: BatteryInfo) {
+        if (!info.isValid) return
         // 80% charge protection alert
         if (_is80PercentAlertEnabled.value && info.isCharging) {
             if (info.level >= 80 && !hasAlerted80Percent) {
