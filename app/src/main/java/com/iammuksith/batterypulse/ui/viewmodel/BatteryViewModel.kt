@@ -7,6 +7,7 @@ import com.iammuksith.batterypulse.data.local.BatteryDatabase
 import com.iammuksith.batterypulse.data.local.BatteryLogEntity
 import com.iammuksith.batterypulse.data.local.ChargingSessionEntity
 import com.iammuksith.batterypulse.data.model.BatteryInfo
+import com.iammuksith.batterypulse.data.model.BatteryStatus
 import com.iammuksith.batterypulse.data.repository.BatteryRepository
 import com.iammuksith.batterypulse.util.NotificationHelper
 import kotlinx.coroutines.flow.MutableStateFlow
