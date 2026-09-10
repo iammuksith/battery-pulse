@@ -104,6 +104,7 @@ class BatteryRepository(
         val present = intent.getBooleanExtra(BatteryManager.EXTRA_PRESENT, true)
 
         var currentNow: Int? = null
+        var chargeCounterMah: Int? = null
         var chargeRemaining: Long? = null
         batteryManager?.let { bm ->
             val currentUa = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
@@ -128,6 +129,7 @@ class BatteryRepository(
             technology = technology,
             isPresent = present,
             currentNowMa = currentNow,
+            chargeCounterMah = chargeCounterMah,
             chargeTimeRemainingMs = chargeRemaining,
             timestamp = System.currentTimeMillis(),
             isValid = true
