@@ -129,7 +129,8 @@ class BatteryRepository(
             isPresent = present,
             currentNowMa = currentNow,
             chargeTimeRemainingMs = chargeRemaining,
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            isValid = true
         )
     }
 
