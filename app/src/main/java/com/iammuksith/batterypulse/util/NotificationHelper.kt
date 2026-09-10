@@ -139,39 +139,35 @@ class NotificationHelper(private val context: Context) {
             // Handled safely
         }
     }
-
     fun showTestAlert(isTempTest: Boolean) {
-        if (!hasNotificationPermission()) return
+    if (!hasNotificationPermission()) return
 
-        val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            401,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+    if (!isTempTest) return
 
-        val title = if (isTempTest) "🔥 [TEST] High Temperature Warning (41.5°C)" else "⚠️ [TEST] Low Battery Alert (18%)"
-        val body = if (isTempTest) {
+    val intent = Intent(context, MainActivity::class.java)
+    val pendingIntent = PendingIntent.getActivity(
+        context,
+        401,
+        intent,
+        PendingIntent.FLAG_IMMUTABLE
+    )
+
+    val notification = NotificationCompat.Builder(context, CHANNEL_CRITICAL)
+        .setSmallIcon(android.R.drawable.stat_notify_error)
+        .setContentTitle("🔥 [TEST] High Temperature Warning (41.5°C)")
+        .setContentText(
             "Simulated alert: Safe temperature limit exceeded! Battery Pulse alert system is active and functioning."
-        } else {
-            "Simulated alert: Battery level dropped below 20%! Battery Pulse alert system is active and functioning."
-        }
+        )
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setVibrate(longArrayOf(0, 250, 100, 250))
+        .setAutoCancel(true)
+        .setContentIntent(pendingIntent)
+        .build()
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_CRITICAL)
-            .setSmallIcon(if (isTempTest) android.R.drawable.stat_notify_error else android.R.drawable.stat_sys_warning)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVibrate(longArrayOf(0, 250, 100, 250))
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .build()
-
-        try {
-            NotificationManagerCompat.from(context).notify(NOTIF_ID_TEST, notification)
-        } catch (_: SecurityException) {
-            // Handled safely
-        }
+    try {
+        NotificationManagerCompat.from(context).notify(NOTIF_ID_TEST, notification)
+    } catch (_: SecurityException) {
+        // Handled safely
+    }
     }
 }
