@@ -108,15 +108,24 @@ class BatteryRepository(
         var chargeRemaining: Long? = null
         batteryManager?.let { bm ->
             val currentUa = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
+
             if (currentUa != Int.MIN_VALUE && currentUa != 0) {
-                currentNow = currentUa / 1000 // mA
+                currentNow = currentUa / 1000
+           }
+
+            val chargeCounterUa =
+                bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
+
+            if (chargeCounterUa != Int.MIN_VALUE && chargeCounterUa > 0) {
+                chargeCounterMah = chargeCounterUa / 1000
             }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val remainingMs = bm.computeChargeTimeRemaining()
-                if (remainingMs > 0) {
-                    chargeRemaining = remainingMs
-                }
-            }
+               val remainingMs = bm.computeChargeTimeRemaining()
+               if (remainingMs > 0) {
+                  chargeRemaining = remainingMs
+               }
+           }
         }
 
         return BatteryInfo(
