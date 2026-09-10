@@ -68,7 +68,6 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
     
     private var hasAlerted80Percent = false
     private var hasAlertedTemp = false
-    private var hasAlertedLow = false
 
     init {
         // Monitor battery changes for alerts
@@ -102,19 +101,6 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
             } else if (info.temperatureCelsius < limit - 2.0f) {
                 hasAlertedTemp = false
             }
-        }
-
-        // Low battery alert (< 20% or threshold)
-        if (_isLowBatteryAlertEnabled.value && !info.isCharging) {
-            val threshold = _lowBatteryThreshold.value
-            if (info.level <= threshold && !hasAlertedLow) {
-                notificationHelper.showLowBatteryAlert(info.level, threshold)
-                hasAlertedLow = true
-            } else if (info.level > threshold + 5) {
-                hasAlertedLow = false
-            }
-        } else if (info.isCharging) {
-            hasAlertedLow = false
         }
     }
 
@@ -245,22 +231,9 @@ fun calculateDischargeAnalysis(
         _isTempAlertEnabled.value = enabled
     }
 
-    fun toggleLowBatteryAlert(enabled: Boolean) {
-        _isLowBatteryAlertEnabled.value = enabled
-    }
-
     fun setSafeTempThreshold(temp: Float) {
         _safeTempThreshold.value = temp
         hasAlertedTemp = false // allow re-trigger on new threshold
-    }
-
-    fun setLowBatteryThreshold(level: Int) {
-        _lowBatteryThreshold.value = level
-        hasAlertedLow = false
-    }
-
-    fun testLowBatteryAlert() {
-        notificationHelper.showTestAlert(isTempTest = false)
     }
 
     fun testOverheatAlert() {
