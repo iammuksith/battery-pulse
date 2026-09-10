@@ -37,7 +37,8 @@ data class BatteryInfo(
     val isPresent: Boolean = true,
     val currentNowMa: Int? = null,
     val chargeTimeRemainingMs: Long? = null,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val isValid: Boolean = false
 ) {
     val temperatureFahrenheit: Float
         get() = (temperatureCelsius * 9f / 5f) + 32f
