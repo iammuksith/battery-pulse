@@ -48,5 +48,5 @@ data class BatteryInfo(
         get() = voltageMv / 1000f
 
     val isCharging: Boolean
-        get() = status == BatteryStatus.CHARGING || plugType != PlugType.UNPLUGGED
+        get() = status == BatteryStatus.CHARGING
 }
