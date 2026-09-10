@@ -93,9 +93,6 @@ class MainActivity : ComponentActivity() {
                 val is80PercentAlert by viewModel.is80PercentAlertEnabled.collectAsStateWithLifecycle()
                 val isTempAlert by viewModel.isTempAlertEnabled.collectAsStateWithLifecycle()
                 val safeTempThreshold by viewModel.safeTempThreshold.collectAsStateWithLifecycle()
-                val isLowBatteryAlert by viewModel.isLowBatteryAlertEnabled.collectAsStateWithLifecycle()
-                val lowBatteryThreshold by viewModel.lowBatteryThreshold.collectAsStateWithLifecycle()
-
                 val dischargeAnalysis = remember(batteryInfo, recentLogs) {
                     viewModel.calculateDischargeAnalysis(batteryInfo, recentLogs)
                 }
@@ -211,7 +208,6 @@ class MainActivity : ComponentActivity() {
                                     dischargeAnalysis = dischargeAnalysis,
                                     lowPowerMode = isLowPowerMode,
                                     safeTempThreshold = safeTempThreshold,
-                                    lowBatteryThreshold = lowBatteryThreshold
                                 )
                                 1 -> BatteryHistoryScreen(
                                     logs = recentLogs,
@@ -231,11 +227,6 @@ class MainActivity : ComponentActivity() {
                                     onToggleTempAlert = { viewModel.toggleTempAlert(it) },
                                     safeTempThreshold = safeTempThreshold,
                                     onSelectTempThreshold = { viewModel.setSafeTempThreshold(it) },
-                                    isLowBatteryAlert = isLowBatteryAlert,
-                                    onToggleLowBatteryAlert = { viewModel.toggleLowBatteryAlert(it) },
-                                    lowBatteryThreshold = lowBatteryThreshold,
-                                    onSelectLowBatteryThreshold = { viewModel.setLowBatteryThreshold(it) },
-                                    onTestLowBatteryAlert = { viewModel.testLowBatteryAlert() },
                                     onTestOverheatAlert = { viewModel.testOverheatAlert() }
                                 )
                             }
