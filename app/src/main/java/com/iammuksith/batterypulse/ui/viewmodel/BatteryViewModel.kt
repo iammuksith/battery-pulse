@@ -65,13 +65,7 @@ class BatteryViewModel(application: Application) : AndroidViewModel(application)
 
     private val _safeTempThreshold = MutableStateFlow(40.0f)
     val safeTempThreshold: StateFlow<Float> = _safeTempThreshold.asStateFlow()
-
-    private val _isLowBatteryAlertEnabled = MutableStateFlow(true)
-    val isLowBatteryAlertEnabled: StateFlow<Boolean> = _isLowBatteryAlertEnabled.asStateFlow()
-
-    private val _lowBatteryThreshold = MutableStateFlow(20)
-    val lowBatteryThreshold: StateFlow<Int> = _lowBatteryThreshold.asStateFlow()
-
+    
     private var hasAlerted80Percent = false
     private var hasAlertedTemp = false
     private var hasAlertedLow = false
