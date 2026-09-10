@@ -25,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.BatteryAlert
 import androidx.compose.material.icons.filled.BatterySaver
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.NotificationsActive
@@ -77,11 +76,6 @@ fun BatteryOptimizerScreen(
     onToggleTempAlert: (Boolean) -> Unit,
     safeTempThreshold: Float,
     onSelectTempThreshold: (Float) -> Unit,
-    isLowBatteryAlert: Boolean,
-    onToggleLowBatteryAlert: (Boolean) -> Unit,
-    lowBatteryThreshold: Int,
-    onSelectLowBatteryThreshold: (Int) -> Unit,
-    onTestLowBatteryAlert: () -> Unit,
     onTestOverheatAlert: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -250,90 +244,7 @@ fun BatteryOptimizerScreen(
             }
         }
 
-        // 1. Low Battery Warning (< 20%) Card
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("alert_low_card"),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = PureWhite),
-                border = BorderStroke(1.dp, CleanBorderColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                            Icon(
-                                imageVector = Icons.Default.BatteryAlert,
-                                contentDescription = "Low Battery Alert",
-                                tint = HealthAlertColor,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.alert_low_title),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "Notify when battery drops below $lowBatteryThreshold%",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                        Switch(
-                            checked = isLowBatteryAlert,
-                            onCheckedChange = { checked ->
-                                if (checked && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                onToggleLowBatteryAlert(checked)
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = EmeraldPrimary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            modifier = Modifier.testTag("alert_low_switch")
-                        )
-                    }
-
-                    if (isLowBatteryAlert) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = "Alert Threshold Level:",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(top = 4.dp)
-                        ) {
-                            listOf(15, 20, 25).forEach { lvl ->
-                                FilterChip(
-                                    selected = lowBatteryThreshold == lvl,
-                                    onClick = { onSelectLowBatteryThreshold(lvl) },
-                                    label = { Text("$lvl%") },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 2. High Temperature / Overheat Warning Card
+        // 1. High Temperature / Overheat Warning Card
         item {
             Card(
                 modifier = Modifier
@@ -416,7 +327,7 @@ fun BatteryOptimizerScreen(
             }
         }
 
-        // 3. 80% Charge Limit Reminder Toggle
+        // 2. 80% Charge Limit Reminder Toggle
         item {
             Card(
                 modifier = Modifier
@@ -474,7 +385,7 @@ fun BatteryOptimizerScreen(
             }
         }
 
-        // 4. Test Notification Buttons (Immediate Verification)
+        // 3. Test Notification Buttons (Immediate Verification)
         item {
             Card(
                 modifier = Modifier
